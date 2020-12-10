@@ -14,6 +14,7 @@ def canUnlockAll(boxes):
 
         for key in boxes[box]:
             if key not in visit:
-                stack.append(key)
+                if key < len(boxes):
+                    stack.append(key)
 
     return len(visit) == len(boxes)
