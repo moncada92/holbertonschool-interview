@@ -2,9 +2,12 @@
 
 
 def canUnlockAll(boxes):
+    """Lockboxes Holberton Interview"""
     visit = set()
     stack = [0]
 
+    if boxes is None or boxes == []:
+        return False
     while stack:
         box = stack.pop()
         visit.add(box)
