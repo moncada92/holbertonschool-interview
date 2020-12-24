@@ -1,250 +1,182 @@
 #include "binary_trees.h"
-
 /**
- * heap_insert -  function that insert a node in binary tree
- * @root: Pointer to the root node
- * @value: Value node
- * Return: Always 0 (Success)
+ * heap_insert - change the heap
+ *
+ * @root: Pointer to the heap
+ * @value: value of the new node
+ *
+ * Return: new node inserted
  */
-
 heap_t *heap_insert(heap_t **root, int value)
 {
-	int full;
+	heap_t *new = NULL;
+	size_t size = 0, height = 0, min = 0, comp = 0;
 
-	full = binary_tree_is_perfect(*root);
+	if (root == NULL)
+		return (NULL);
+
+	new = malloc(sizeof(heap_t));
+	if (new == NULL)
+		return (NULL);
+
+	new->n = value;
+	new->parent = NULL;
+	new->left = NULL;
+	new->right = NULL;
+
 	if (*root == NULL)
 	{
-		*root = binary_tree_node(*root, value);
-		return (*root);
+		*root = new;
+		return (new);
 	}
 
-	if (full == 1)
-		if (value > (*root)->n)
-			*root = binary_tree_insert_left(*root, value);
-		else
-			return (binary_tree_insert_left(*root, value));
-	else
-	{
-		if (value > (*root)->n)
-			*root = binary_tree_validation(*root, value);
-		else
-			return (binary_tree_validation(*root, value));
-	}
-	return (*root);
+	size = sizeHeightMiMxLv(*root, 0, 0);
+	height = sizeHeightMiMxLv(*root, 1, 0);
+	min = sizeHeightMiMxLv(NULL, 2, height + 1);
+	comp = sizeHeightMiMxLv(*root, 5, 0);
+
+	heap_max(root, &new, height, size, min, comp);
+	changeParent(&new);
+	return (new);
 }
-
 /**
- * binary_tree_validation -  function that validate a binary tree node
- * @tree: Pointer to the tree node
- * @value: Value node
- * Return: Always 0 (Success)
- */
-binary_tree_t *binary_tree_validation(binary_tree_t *tree, int value)
-{
-	int num1, num2, full, full1;
-
-	if (tree->left && tree->right)
-	{
-		num1 = binary_tree_height(tree->left);
-		num2 = binary_tree_height(tree->right);
-		full = binary_tree_is_perfect(tree->left);
-		full1 = binary_tree_is_perfect(tree->right);
-		if (num1 == num2 && full1)
-		{
-			return (binary_tree_validation(tree->left, value));
-		}
-		else if (num1 == num2 && full1 == 0)
-			return (binary_tree_validation(tree->right, value));
-		else if (full == 0)
-		{
-			return (binary_tree_validation(tree->left, value));
-		}
-		else
-			return (binary_tree_validation(tree->right, value));
-	}
-	else
-	{
-		if (tree->left == NULL)
-			return (binary_tree_insert_left(tree, value));
-		if (tree->right == NULL)
-			return (binary_tree_insert_right(tree, value));
-	}
-	return (0);
-}
-
-/**
- * binary_tree_insert_left - function that inserts a node as the left-child
+ * heap_max - insert in perfect order
  *
- * @parent: node parent
- * @value: value node
+ * @pa: pointer to the parent
+ * @nw: pointer to the new node
+ * @h: height
+ * @s: size
+ * @mi: min size
+ * @cmp: is complete
  *
- * Return: binary tree
+ * Return: new node inserted
  */
-
-binary_tree_t *binary_tree_insert_left(binary_tree_t *parent, int value)
+void heap_max(heap_t **pa, heap_t **nw, size_t h, size_t s,
+	      size_t mi, size_t cmp)
 {
-	binary_tree_t *node = NULL;
+	size_t fullR = 0, fullL = 0;
 
-	if (parent == NULL)
-		return (NULL);
-	if (value > parent->n)
+	fullL = sizeHeightMiMxLv((*pa)->left, 5, 0);
+	fullR = sizeHeightMiMxLv((*pa)->right, 5, 0);
+
+	if (fullL == 0 && fullR == 0)
 	{
-		if (parent->left == NULL)
-		{
-			node = binary_tree_node(parent, value);
-			node->left = parent;
-			node->parent = parent->parent;
-			node->right = parent->right;
-			if (parent->parent != NULL)
-			{
-				if (parent->parent->parent != NULL)
-					parent->parent->left = node;
-				else
-					parent->parent->right = node;
-			}
-			parent->parent = node;
-			parent->left = NULL;
-			parent->right = NULL;
-		}
-		else
-			node = binary_tree_insert_left(parent->left, value);
+		(*nw)->parent = *pa;
+		(*pa)->left = *nw;
+		return;
+	} else if (fullL == 1 && fullR == 0 && (*pa)->right == NULL)
+	{
+		(*nw)->parent = *pa;
+		(*pa)->right = *nw;
+		return;
+	}
+
+	if (s - (mi - 1) < mi / 2 || cmp == 1)
+	{
+		s = sizeHeightMiMxLv((*pa)->left, 0, 0);
+		h = sizeHeightMiMxLv((*pa)->left, 1, 0);
+		mi = sizeHeightMiMxLv(NULL, 2, h + 1);
+		cmp = sizeHeightMiMxLv((*pa)->left, 5, 0);
+		heap_max(&(*pa)->left, nw, h, s, mi, cmp);
+		return;
 	}
 	else
 	{
-		if (parent->left == NULL)
-		{
-			node = binary_tree_node(parent, value);
-			parent->left = node;
-		}
-		else
-			node = binary_tree_insert_left(parent->left, value);
+		s = sizeHeightMiMxLv((*pa)->right, 0, 0);
+		h = sizeHeightMiMxLv((*pa)->right, 1, 0);
+		mi = sizeHeightMiMxLv(NULL, 2, h + 1);
+		cmp = sizeHeightMiMxLv((*pa)->right, 5, 0);
+		heap_max(&(*pa)->right, nw, h, s, mi, cmp);
+		return;
 	}
-	return (node);
 }
-
 /**
- * binary_tree_insert_right - function that inserts a node as the right-child
+ * sizeHeightMiMxLv - function to calculate
+ * the heigh, size, min, max, leaves
  *
- * @parent: node parent
- * @value: value node
+ * @tree: pointer to the root
+ * @sh: number of menu. 0: size, 1: height, 2: min, 3: max,
+ *  4: leaves, 5: perfect
+ * @height: heigh
  *
- * Return: binary tree
+ * Return: the value needed
  */
-
-binary_tree_t *binary_tree_insert_right(binary_tree_t *parent, int value)
+size_t sizeHeightMiMxLv(heap_t *tree, size_t sh, size_t height)
 {
-	binary_tree_t *node = NULL;
+	size_t count1 = 0, count2 = 0;
 
-	if (parent == NULL)
-		return (NULL);
-	if (value > parent->n)
+	if (sh == 0)
 	{
-		if (parent->right == NULL)
-		{
-			node = binary_tree_node(parent, value);
-			node->right = parent;
-			node->parent = parent->parent;
-			node->left = parent->left;
-			if (parent->parent != NULL)
-				parent->parent->left = node;
-			parent->left->parent = node;
-			parent->parent = node;
-			parent->left = NULL;
-			parent->right = NULL;
-		}
-		else
-			node = binary_tree_insert_right(parent->right, value);
+		if (tree == NULL)
+			return (0);
+		count1 += sizeHeightMiMxLv(tree->left, 0, 0) + 1;
+		count1 += sizeHeightMiMxLv(tree->right, 0, 0);
+		return (count1);
+	} else if (sh == 1)
+	{
+		if (tree == NULL)
+			return (0);
+		if (tree->left)
+			count1 = sizeHeightMiMxLv(tree->left, 1, 0) + 1;
+		if (tree->right)
+			count2 = sizeHeightMiMxLv(tree->right, 1, 0) + 1;
+		return ((count1 < count2) ? count2 : count1);
+	} else if (sh == 2)
+		return (powR(2.0, height - 1));
+	else if (sh == 3)
+		return ((powR(2.0, height - 1)) + (powR(2.0, height - 1) - 1));
+	else if (sh == 4)
+	{
+		if (tree == NULL)
+			return (0);
+		if (tree->left ==  NULL && tree->right == NULL)
+			return (1);
+		count1 = sizeHeightMiMxLv(tree->left, 4, 0);
+		count2 = sizeHeightMiMxLv(tree->right, 4, 0);
+		return (count1 + count2);
 	}
 	else
 	{
-		if (parent->right == NULL)
-		{
-			node = binary_tree_node(parent, value);
-			parent->right = node;
-		}
-		else
-			node = binary_tree_insert_right(parent->right, value);
+		if (tree == NULL)
+			return (0);
+		count1 = sizeHeightMiMxLv(tree, 4, 0);
+		count2 = sizeHeightMiMxLv(tree, 1, 0);
+		return ((count1 == powR(2, count2)) ? 1 : 0);
 	}
-
-	return (node);
 }
-
 /**
- * binary_tree_height - function that measures the height
- * of a binary tree.
- * @tree: pointer to the root node of the tree to measure the height.
+ * powR - function to pow function
  *
- * Return: a size_t value
+ * @x: base
+ * @y: exp
+ *
+ * Return: x^y
  */
-size_t binary_tree_height(const binary_tree_t *tree)
+size_t powR(size_t x, size_t y)
 {
-	size_t height_1, height_2;
-
-	if (tree == NULL)
-		return (0);
-
-	height_1 = 0;
-	height_2 = 0;
-	if (tree->left)
-		height_1 = 1;
-	if (tree->right)
-		height_2 = 1;
-
-	height_2 += binary_tree_height(tree->right);
-	height_1 += binary_tree_height(tree->left);
-	if (height_2 > height_1)
-		return (height_2);
-	return (height_1);
-}
-
-/**
- * binary_tree_leaves - function that counts the leaves in a binary tree
- *
- * @tree: tree
- *
- * Return: Always 0(Success)
- **/
-
-size_t binary_tree_leaves(const binary_tree_t *tree)
-{
-	size_t leavesT;
-
-	if (tree == NULL)
-		return (0);
-
-	if (tree->left == NULL && tree->right == NULL)
+	if (y != 0)
+		return (x * powR(x, (y - 1)));
+	else
 		return (1);
-
-	leavesT = binary_tree_leaves(tree->left) +
-		binary_tree_leaves(tree->right);
-
-	return (leavesT);
 }
-
 /**
- * binary_tree_is_perfect -  function that checks if a binary tree is perfect
- * binary tree
+ * changeParent - change parent if parent->n < new->n
  *
- * @tree: tree
+ * @new: new node created
  *
- * Return: Always 0(Success)
- **/
-
-int binary_tree_is_perfect(const binary_tree_t *tree)
+ * Return: nothing
+ */
+void changeParent(heap_t **new)
 {
-	int leavesT = binary_tree_leaves(tree);
-	int heightT = binary_tree_height(tree);
-	int perfectT;
-	int i, result = 1;
+	heap_t *current = (*new)->parent;
+	int tmp = 0;
 
-	for (i = 0; i < heightT; i++)
-		result = 2 * result;
-
-	perfectT = result;
-	if (tree == NULL)
-		return (0);
-
-	if (leavesT == perfectT)
-		return (1);
-	return (0);
+	while (current != NULL && current->n < (*new)->n)
+	{
+		tmp = current->n;
+		current->n = (*new)->n;
+		(*new)->n = tmp;
+		*new = current;
+		current = (*new)->parent;
+	}
 }
