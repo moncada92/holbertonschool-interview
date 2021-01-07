@@ -3,21 +3,21 @@
 Minimum Operations
 """
 
+
 def minOperations(n):
-  """
-  caluclate result the minimum operations
-  """
-  count = 0
-  copy = 1
-  tmp = 0
+    """
+    caluclate result the minimum operations
+    """
+    quantity = n
+    div = 2
+    tmp = 0
 
-  while copy < n:
-    if n % copy == 0:
-      tmp = copy
-      copy *= 2
-      count += 1
-    else:
-      copy = tmp
-    count += 1
+    while (quantity > 1):
+        if quantity % div == 0:
+            quantity = int(quantity / div)
+            tmp += div
+            div = 2
+        else:
+            div += 1
 
-  return count
+    return tmp
