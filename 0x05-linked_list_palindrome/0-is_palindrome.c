@@ -13,8 +13,7 @@ int is_palindrome(listint_t **head)
 {
 	listint_t *current = *head;
 	listint_t *tmp, *tmp2, *tmp3;
-	int first = 0;
-	int last = 0;
+	int first = 0, result = 0, last = 0;
 	int search_middle = 0;
 
 	if (current == NULL)
@@ -33,10 +32,7 @@ int is_palindrome(listint_t **head)
 			tmp2 = current->next;
 			while (tmp != NULL)
 			{
-				//printf("----- TMP -----\n");
 				last++;
-				//printf("%d \n", tmp->n);
-				//printf("--------------- \n");
 				tmp = tmp->next;
 				if (tmp == NULL)
 					break;
@@ -46,19 +42,22 @@ int is_palindrome(listint_t **head)
 	}
 	if (first == last)
 	{
-		int result = is_equal(&tmp3, &tmp2);
+		result = is_equal(&tmp3, &tmp2);
 		if (result)
 			return (1);
-	} else {
+	}
+	else
+	{
 		return (0);
 	}
-
 	return (0);
 }
 
 /**
- * is_equal - if it is igual
- * head
+ * is_equal - if current and tmp are iquals
+ * @current: original linked list
+ * @tmp: middle linked list the current
+ * Return: return 1 if they are equals otherwhise
  */
 
 int is_equal(listint_t **current, listint_t **tmp)
@@ -66,7 +65,8 @@ int is_equal(listint_t **current, listint_t **tmp)
 	listint_t *prev = NULL, *currnt = *tmp;
 	listint_t *next;
 
-	while (currnt != NULL) {
+	while (currnt != NULL)
+	{
 		next = currnt->next;
 		currnt->next = prev;
 		prev = currnt;
