@@ -2,90 +2,60 @@
 #include <stdlib.h>
 #include "lists.h"
 
-
 /**
- * is_palindrome - check if is palidrome a linked list
- * @head: linked list
- * Return: if is palindrome 1 otherwise 0
- */
-
+ * is_palindrome - checks if a singly linked list is a palindrome
+ * @head: head of the singly linked list
+ *
+ * Return: 0 if it is not a palindrome, 1 if it is a palindrome
+ **/
 int is_palindrome(listint_t **head)
 {
-	listint_t *current = *head;
-	listint_t *tmp, *tmp2, *tmp3;
-	int first = 0, result = 0, last = 0;
-	int search_middle = 0;
+	listint_t  *left = *head;
+	listint_t *right = *head;
+	int len = 0, num;
 
-	if (current == NULL)
-		return (0);
-	tmp3 = *head;
-	while (current->next != NULL)
-	{
-		if (search_middle)
-			first += 0;
-		else
-			first++;
-		if (current->n == current->next->n)
-		{
-			search_middle = 1;
-			tmp = current->next;
-			tmp2 = current->next;
-			while (tmp != NULL)
-			{
-				last++;
-				tmp = tmp->next;
-				if (tmp == NULL)
-					break;
-			}
-		}
-		current = current->next;
-	}
-	if (first == last)
-	{
-		result = is_equal(&tmp3, &tmp2);
-		if (result)
-			return (1);
-	}
-	else
-	{
-		return (0);
-	}
+	left = *head;
+	num = recursive(left, right, len);
+	if (num || *head == NULL)
+		return (1);
 	return (0);
 }
 
 /**
- * is_equal - if current and tmp are iquals
- * @current: original linked list
- * @tmp: middle linked list the current
- * Return: return 1 if they are equals otherwhise
- */
-
-int is_equal(listint_t **current, listint_t **tmp)
+ * recursive - checks if a singly linked list is a palindrome
+ * @left: head of the singly linked list
+ * @right: tail of the singly linked list
+ * @len: value of the singly linked list
+ *
+ * Return: 0 if it is not a palindrome, 1 if it is a palindrome
+ **/
+int recursive(listint_t *left, listint_t *right, int len)
 {
-	listint_t *prev = NULL, *currnt = *tmp;
-	listint_t *next;
+	int count = 0, num = len;
 
-	while (currnt != NULL)
+	if (right != NULL)
 	{
-		next = currnt->next;
-		currnt->next = prev;
-		prev = currnt;
-		currnt = next;
-	}
-
-	*tmp = prev;
-
-	while (*tmp)
-	{
-		if ((*tmp)->n != (*current)->n)
-		{
-			printf("tmp: %d != current: %d \n", (*tmp)->n, (*current)->n);
+		len++;
+		num = recursive(left, right->next, len);
+		if (num / 2 < len)
+			return (num);
+		if (num == 0)
 			return (0);
-		}
+	}
+	else
+		return (num);
 
-		*tmp = (*tmp)->next;
-		*current = (*current)->next;
+
+	while (count < num - len)
+	{
+		left = left->next;
+		count++;
 	}
 
-	return (1);
+	if (left->n == right->n)
+	{
+		return (num);
+	}
+	else
+		return (0);
 }
