@@ -9,26 +9,24 @@
 
 int check_cycle(listint_t *list)
 {
-	listint_t *start = list;
-	listint_t *end = list;
+	listint_t *crnt1 = list, *crnt2 = list;
 
-	if (list != NULL || list->next != NULL)
-	{
+	if (list == NULL)
 		return (0);
-	}
 
+	if (crnt2->next == NULL)
+		return (0);
+	crnt2 = crnt2->next->next;
 
-	if (list == list->next)
+	while (crnt1 != NULL && crnt2 != NULL)
 	{
-		return (1);
-	}
+		crnt1 = crnt1->next;
 
-	while (end->next != NULL && end->next->next != NULL)
-	{
-		start = start->next;
-		end = end->next->next;
+		if (crnt2->next == NULL)
+			return (0);
+		crnt2 = crnt2->next->next;
 
-		if (start == end)
+		if (crnt1 == crnt2)
 			return (1);
 	}
 
