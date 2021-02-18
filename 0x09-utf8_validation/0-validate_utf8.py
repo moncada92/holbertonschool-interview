@@ -37,7 +37,7 @@ def validUTF8(data):
                 return False
 
             if charBytesPrv == 1:
-                    first = True
+                first = True
     return first
 
 
