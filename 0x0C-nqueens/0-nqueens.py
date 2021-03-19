@@ -121,5 +121,6 @@ def start():
     N = int(args[1])
     chess(N)
 
+
 if __name__ == "__main__":
     start()
