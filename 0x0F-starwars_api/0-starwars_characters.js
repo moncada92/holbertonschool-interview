@@ -1,4 +1,7 @@
-#!/usr/bin/env node
+#!/usr/bin/node
+/*
+  Star Wars Characters
+*/
 const request = require('request');
 
 const id = process.argv[2];
